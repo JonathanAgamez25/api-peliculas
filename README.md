@@ -1,261 +1,157 @@
-# 🎬 API REST - Gestión de Películas
-### Institución Universitaria Digital de Antioquia
+# ☀️ API REST - Gestión para Empresas de Energía Solar
 
-API REST desarrollada con Node.js, Express y MySQL para la gestión de contenido multimedia (películas y series) de la plataforma de entretenimiento de la IU Digital de Antioquia.
+API REST construida con Node.js, Express y MySQL para apoyar a pequeñas empresas del sector solar en procesos de:
 
----
-
-## 🛠️ Tecnologías utilizadas
-
-- **Node.js** - Entorno de ejecución
-- **Express** - Framework para el servidor web
-- **MySQL** - Base de datos relacional
-- **mysql2** - Driver de conexión a MySQL
-- **dotenv** - Manejo de variables de entorno
-- **nodemon** - Reinicio automático en desarrollo
+- Gestión de clientes.
+- Gestión de servicios (instalación, mantenimiento, diagnóstico, limpieza de paneles, etc.).
+- Programación y seguimiento de órdenes de trabajo.
 
 ---
 
-## 📁 Estructura del proyecto
+## 🛠️ Tecnologías
 
-```
-api-peliculas/
-├── src/
-│   ├── config/
-│   │   └── db.js               → Conexión a MySQL
-│   ├── controllers/
-│   │   ├── generoController.js
-│   │   ├── directorController.js
-│   │   ├── productoraController.js
-│   │   ├── tipoController.js
-│   │   └── mediaController.js
-│   ├── routes/
-│   │   ├── generoRoutes.js
-│   │   ├── directorRoutes.js
-│   │   ├── productoraRoutes.js
-│   │   ├── tipoRoutes.js
-│   │   └── mediaRoutes.js
-│   └── index.js
-├── .env
-├── .gitignore
-└── package.json
-```
+- Node.js
+- Express
+- MySQL
+- mysql2
+- dotenv
+- nodemon
 
 ---
 
-## ⚙️ Instalación y configuración
+## ⚙️ Instalación
 
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/JonathanAgamez225/api-peliculas.git
-cd api-peliculas
-```
-
-### 2. Instalar dependencias
 ```bash
 npm install
 ```
 
-### 3. Configurar variables de entorno
-Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
-```
+Crea un archivo `.env` en la raíz:
+
+```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=tu_contraseña
-DB_NAME=db_peliculas
+DB_PASSWORD=tu_clave
+DB_NAME=db_solar
 DB_PORT=3306
-
 PORT=3000
 ```
 
-### 4. Crear la base de datos
-Ejecuta el siguiente script en MySQL:
+---
+
+## 🧱 Script de base de datos
+
 ```sql
-CREATE DATABASE IF NOT EXISTS db_peliculas;
-USE db_peliculas;
+CREATE DATABASE IF NOT EXISTS db_solar;
+USE db_solar;
 
-CREATE TABLE genero (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-    estado ENUM('activo','inactivo') DEFAULT 'activo',
-    descripcion TEXT,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE cliente (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(150) NOT NULL,
+  telefono VARCHAR(30),
+  correo VARCHAR(150),
+  direccion VARCHAR(255),
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE director (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nombres VARCHAR(150) NOT NULL,
-    estado ENUM('activo','inactivo') DEFAULT 'activo',
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE servicio (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(120) NOT NULL,
+  tipo ENUM('instalacion','mantenimiento','inspeccion','limpieza','otro') NOT NULL,
+  costo_base DECIMAL(12,2) DEFAULT 0,
+  descripcion TEXT,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE productora (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(150) NOT NULL,
-    estado ENUM('activo','inactivo') DEFAULT 'activo',
-    slogan VARCHAR(255),
-    descripcion TEXT,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE tipo (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE media (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    serial VARCHAR(100) NOT NULL UNIQUE,
-    titulo VARCHAR(255) NOT NULL,
-    sinopsis TEXT,
-    url VARCHAR(500) NOT NULL UNIQUE,
-    imagen_portada VARCHAR(500),
-    anio_estreno YEAR,
-    genero_id INT NOT NULL,
-    director_id INT NOT NULL,
-    productora_id INT NOT NULL,
-    tipo_id INT NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (genero_id) REFERENCES genero(id),
-    FOREIGN KEY (director_id) REFERENCES director(id),
-    FOREIGN KEY (productora_id) REFERENCES productora(id),
-    FOREIGN KEY (tipo_id) REFERENCES tipo(id)
+CREATE TABLE orden_trabajo (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  cliente_id INT NOT NULL,
+  servicio_id INT NOT NULL,
+  fecha_programada DATETIME NOT NULL,
+  estado ENUM('pendiente','en_proceso','finalizada','cancelada') DEFAULT 'pendiente',
+  observaciones TEXT,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (cliente_id) REFERENCES cliente(id),
+  FOREIGN KEY (servicio_id) REFERENCES servicio(id)
 );
 ```
 
-### 5. Iniciar el servidor
-```bash
-# Modo desarrollo (con nodemon)
-npm run dev
+---
 
-# Modo producción
+## ▶️ Ejecutar
+
+```bash
+npm run dev
+# o
 npm start
 ```
 
-El servidor quedará corriendo en: `http://localhost:3000`
-
 ---
 
-## 📡 Endpoints disponibles
+## 📡 Endpoints
 
-### 🎭 Género `/api/generos`
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | /api/generos | Obtener todos los géneros |
-| GET | /api/generos/:id | Obtener un género por ID |
-| POST | /api/generos | Crear un género |
-| PUT | /api/generos/:id | Actualizar un género |
-| DELETE | /api/generos/:id | Eliminar un género |
+### Clientes `/api/clientes`
+- `GET /api/clientes`
+- `GET /api/clientes/:id`
+- `POST /api/clientes`
+- `PUT /api/clientes/:id`
+- `DELETE /api/clientes/:id`
 
-**Ejemplo POST:**
+Ejemplo body:
+
 ```json
 {
-    "nombre": "Acción",
-    "estado": "activo",
-    "descripcion": "Películas con secuencias de acción intensa"
+  "nombre": "Solar Tech S.A.S",
+  "telefono": "+57 3001234567",
+  "correo": "operaciones@solartech.com",
+  "direccion": "Calle 10 # 20 - 30"
+}
+```
+
+### Servicios `/api/servicios`
+- `GET /api/servicios`
+- `GET /api/servicios/:id`
+- `POST /api/servicios`
+- `PUT /api/servicios/:id`
+- `DELETE /api/servicios/:id`
+
+Ejemplo body:
+
+```json
+{
+  "nombre": "Mantenimiento preventivo",
+  "tipo": "mantenimiento",
+  "costo_base": 450000,
+  "descripcion": "Revisión de inversor, limpieza y chequeo de conexiones"
+}
+```
+
+### Órdenes de trabajo `/api/ordenes-trabajo`
+- `GET /api/ordenes-trabajo`
+- `GET /api/ordenes-trabajo/:id`
+- `POST /api/ordenes-trabajo`
+- `PUT /api/ordenes-trabajo/:id`
+- `DELETE /api/ordenes-trabajo/:id`
+
+Ejemplo body:
+
+```json
+{
+  "cliente_id": 1,
+  "servicio_id": 1,
+  "fecha_programada": "2026-02-21 09:30:00",
+  "estado": "pendiente",
+  "observaciones": "Verificar posible sombra parcial por antena"
 }
 ```
 
 ---
 
-### 🎬 Director `/api/directores`
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | /api/directores | Obtener todos los directores |
-| GET | /api/directores/:id | Obtener un director por ID |
-| POST | /api/directores | Crear un director |
-| PUT | /api/directores/:id | Actualizar un director |
-| DELETE | /api/directores/:id | Eliminar un director |
+## ✅ Próximos pasos sugeridos
 
-**Ejemplo POST:**
-```json
-{
-    "nombres": "Christopher Nolan",
-    "estado": "activo"
-}
-```
-
----
-
-### 🏢 Productora `/api/productoras`
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | /api/productoras | Obtener todas las productoras |
-| GET | /api/productoras/:id | Obtener una productora por ID |
-| POST | /api/productoras | Crear una productora |
-| PUT | /api/productoras/:id | Actualizar una productora |
-| DELETE | /api/productoras/:id | Eliminar una productora |
-
-**Ejemplo POST:**
-```json
-{
-    "nombre": "Warner Bros",
-    "estado": "activo",
-    "slogan": "The stuff that dreams are made of",
-    "descripcion": "Productora de entretenimiento estadounidense"
-}
-```
-
----
-
-### 📺 Tipo `/api/tipos`
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | /api/tipos | Obtener todos los tipos |
-| GET | /api/tipos/:id | Obtener un tipo por ID |
-| POST | /api/tipos | Crear un tipo |
-| PUT | /api/tipos/:id | Actualizar un tipo |
-| DELETE | /api/tipos/:id | Eliminar un tipo |
-
-**Ejemplo POST:**
-```json
-{
-    "nombre": "Película",
-    "descripcion": "Producción cinematográfica de formato largo"
-}
-```
-
----
-
-### 🎥 Media `/api/medias`
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | /api/medias | Obtener todas las producciones |
-| GET | /api/medias/:id | Obtener una producción por ID |
-| POST | /api/medias | Crear una producción |
-| PUT | /api/medias/:id | Actualizar una producción |
-| DELETE | /api/medias/:id | Eliminar una producción |
-
-**Ejemplo POST:**
-```json
-{
-    "serial": "MOV001",
-    "titulo": "Inception",
-    "sinopsis": "Un ladrón que roba secretos corporativos a través del sueño",
-    "url": "https://www.inception.com",
-    "imagen_portada": "https://www.inception.com/poster.jpg",
-    "anio_estreno": "2010",
-    "genero_id": 1,
-    "director_id": 1,
-    "productora_id": 1,
-    "tipo_id": 1
-}
-```
-
-> ⚠️ **Nota:** Al crear o actualizar una producción, el sistema valida automáticamente que el género, director y productora tengan estado **activo**. Si alguno está inactivo, la operación será rechazada.
-
----
-
-## 👤 Autor
-
-**Jonatan D. Ávila Agamez**  
-Proyecto Integrado 2 - 2026-1  
-Institución Universitaria Digital de Antioquia  
-Docente: Federico Henao
+- Agregar autenticación por roles (admin, técnico, comercial).
+- Crear módulo de inventario (paneles, inversores, estructuras, baterías).
+- Registrar evidencias fotográficas por orden de trabajo.
+- Dashboard con KPIs: órdenes finalizadas, ingresos por mes, tiempos promedio.
