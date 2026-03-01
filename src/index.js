@@ -2,24 +2,23 @@ const express = require("express");
 require("dotenv").config();
 require("./config/db");
 
-const generoRoutes = require("./routes/generoRoutes");
-const directorRoutes = require("./routes/directorRoutes");
-const productoraRoutes = require("./routes/productoraRoutes");
-const tipoRoutes = require("./routes/tipoRoutes");
-const mediaRoutes = require("./routes/mediaRoutes");
+const clienteRoutes = require("./routes/clienteRoutes");
+const servicioRoutes = require("./routes/servicioRoutes");
+const ordenTrabajoRoutes = require("./routes/ordenTrabajoRoutes");
 
 const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ mensaje: "API Películas funcionando correctamente" });
+  res.json({
+    mensaje:
+      "API Solar funcionando correctamente para gestión de clientes, servicios y órdenes de trabajo",
+  });
 });
 
-app.use("/api/generos", generoRoutes);
-app.use("/api/directores", directorRoutes);
-app.use("/api/productoras", productoraRoutes);
-app.use("/api/tipos", tipoRoutes);
-app.use("/api/medias", mediaRoutes);
+app.use("/api/clientes", clienteRoutes);
+app.use("/api/servicios", servicioRoutes);
+app.use("/api/ordenes-trabajo", ordenTrabajoRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
