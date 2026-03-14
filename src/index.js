@@ -2,6 +2,8 @@ const express = require("express");
 require("dotenv").config();
 require("./config/db");
 
+const cors = require("cors");
+
 const generoRoutes = require("./routes/generoRoutes");
 const directorRoutes = require("./routes/directorRoutes");
 const productoraRoutes = require("./routes/productoraRoutes");
@@ -9,6 +11,7 @@ const tipoRoutes = require("./routes/tipoRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
